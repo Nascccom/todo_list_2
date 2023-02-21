@@ -1,48 +1,84 @@
-import React, {useRef} from 'react';
-import {TodolistPropsType} from "../App";
+import React from 'react';
 import {FilterValuesTypes} from "../redux/todolists-reducer.";
+import {TasksType} from "../redux/tasks-reducer";
+import style from './Todolist.module.css'
+import {EditSpan} from "./EditSpan/EditSpan";
+import {Button} from "./Button/Button";
+import {AddingAnElement} from "./AddingElement/AddingElement";
+import {MapDispatchPropsType} from "./TodolistContainer";
 
-export const Todolist = (props: TodolistPropsType) => {
-    const newTaskTitle = useRef<HTMLInputElement>(null)
+type TodolistPropsType = MapDispatchPropsType & {
+    tasks: TasksType
+    todolistId: string
+    titleTodolist: string
+}
+
+export const Todolist: React.FC<TodolistPropsType> = props => {
+    const {
+        tasks,
+        todolistId,
+        titleTodolist,
+        removeTask,
+        addTask,
+        changeFilter,
+        changeStatusTask,
+        updateTitleTask,
+        updateTitleTodolist
+    } = props;
 
     const onChangeFilterValue = (filterValue: FilterValuesTypes) => {
-        props.changeFilter(props.todolistId, filterValue)
+        changeFilter(todolistId, filterValue)
     }
 
     const onRemoveTask = (taskId: string) => {
-        props.removeTask(props.todolistId, taskId)
+        removeTask(todolistId, taskId)
     }
 
-    const onAddTask = () => {
-        // console.log(newTaskTitle.current)
-        // if (newTaskTitle.current !== null) {
-        //     props.addTask(props.todolistId, newTaskTitle.current.value)
-        // }
+    const onAddTask = (newTitle: string) => {
+        addTask(todolistId, newTitle)
     }
+
+    const onChangeStatus = (taskId: string, checked: boolean) => {
+        changeStatusTask(todolistId, taskId, checked)
+    }
+
+    const onUpdateTodolistTitle = (newTitle: string) => {
+        updateTitleTodolist(todolistId, newTitle)
+    }
+
+    const mappedTask = tasks[todolistId].map((el) => {
+        const onUpdateTitleTask = (newTitle: string) => {
+            updateTitleTask(todolistId, el.id, newTitle)
+        }
+        return (
+          <li key={el.id}>
+              <input type="checkbox"
+                     checked={el.isDone}
+                     onChange={(e) => onChangeStatus(el.id, e.currentTarget.checked)}
+              />
+              <EditSpan title={el.title}
+                        callBack={onUpdateTitleTask}
+              />
+              <Button nameButton={'X'} callBack={() => onRemoveTask(el.id)}/>
+          </li>
+        )
+    })
 
     return (
       <div>
-          <h3>{}</h3>
+          <EditSpan title={titleTodolist}
+                    style={style.title}
+                    callBack={onUpdateTodolistTitle}
+          />
           <div>
-              <input ref={newTaskTitle}/>
-              <button onChange={onAddTask}>Add</button>
+              <AddingAnElement addItem={onAddTask}/>
           </div>
           <ul>
-              {props.tasks[props.todolistId].map((el) => {
-                  return (
-                    <li key={el.id}>
-                        <input type="checkbox" onChange={onAddTask}/>
-                        <span>{el.title}</span>
-                        <button onClick={() => onRemoveTask(el.id)}>X</button>
-                    </li>
-                  )
-              })}
+              {mappedTask}
           </ul>
-          <div>
-              <button onClick={() => onChangeFilterValue('all')}>All</button>
-              <button onClick={() => onChangeFilterValue('active')}>Active</button>
-              <button onClick={() => onChangeFilterValue('completed')}>Completed</button>
-          </div>
+              <Button nameButton={'All'} callBack={() => onChangeFilterValue('all')}/>
+              <Button nameButton={'Active'} callBack={() => onChangeFilterValue('active')}/>
+              <Button nameButton={'Completed'} callBack={() => onChangeFilterValue('completed')}/>
       </div>
     );
 };
