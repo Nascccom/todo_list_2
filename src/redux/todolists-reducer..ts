@@ -1,5 +1,6 @@
 import {v1} from "uuid";
-import {CommonTodolistTypes, TODOLISTS_TYPES} from "./todolistAC";
+import {TODOLISTS_TYPES} from "./todolistAC";
+import {CommonTypesAC} from "./store";
 
 export type FilterValuesTypes = 'active' | 'all' | 'completed'
 export type TodolistType = {
@@ -11,12 +12,13 @@ export type TodolistsType = TodolistType[]
 
 export const todolistID1 = v1();
 export const todolistID2 = v1();
+
 const initialState: TodolistsType = [
-    {id: todolistID1, title: 'SQL', filter: 'active'},
+    {id: todolistID1, title: 'SQL', filter: 'all'},
     {id: todolistID2, title: 'English', filter: 'all'},
 ]
 
-export const todolistsReducer = (state: TodolistsType = initialState, action: CommonTodolistTypes): TodolistsType => {
+export const todolistsReducer = (state: TodolistsType = initialState, action: CommonTypesAC): TodolistsType => {
     switch (action.type) {
         case TODOLISTS_TYPES.ADD_TODOLIST:
             return [
