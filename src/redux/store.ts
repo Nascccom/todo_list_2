@@ -12,6 +12,5 @@ export const rootReducer = combineReducers({
 export const store = createStore(rootReducer)
 
 export type AppStateType = ReturnType<typeof rootReducer>
-export type AppDispatch = typeof store.dispatch
 
 export type CommonTypesAC = CommonTasksTypes | CommonTodolistTypes
