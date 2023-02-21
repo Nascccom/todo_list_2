@@ -1,76 +1,42 @@
 import React, {Dispatch} from 'react';
 import './App.css';
 import {connect, ConnectedProps} from "react-redux";
-import {Todolist} from "./Components/Todolist";
 import {AppStateType, CommonTypesAC} from "./redux/store";
-import {FilterValuesTypes, todolistID1, TodolistType} from "./redux/todolists-reducer.";
-import {TasksType} from "./redux/tasks-reducer";
-import {addTaskAC, removeTaskAC} from "./redux/tasksAC";
-import {changeFilterAC} from "./redux/todolistAC";
+import {addTodolistAC} from "./redux/todolistAC";
+import {AddingAnElement} from "./Components/AddingElement/AddingElement";
+import TodolistContainer from "./Components/TodolistContainer";
+
 
 
 export const App: React.FC<TProps> = props => {
-
-    const {
-        todolistId,
-        todolist,
-        tasks,
-        removeTask,
-        addTask,
-        changeFilter
-    } = props;
+    const onAddTodolist = (newTitle: string) => {
+        props.addTodolist(newTitle)
+    }
 
     return (
-      <Todolist todolistId={todolistId}
-                todolist={todolist}
-                tasks={tasks}
-                removeTask={removeTask}
-                addTask={addTask}
-                changeFilter={changeFilter}
-      />
+      <div className={'App'}>
+          <AddingAnElement addItem={onAddTodolist}/>
+          <TodolistContainer/>
+      </div>
     );
 }
 
-const mapStateToProps = (state: AppStateType): MapStatePropsType => {
-    return {
-        todolistId: todolistID1,
-        todolist: state.todolists,
-        tasks: state.tasks
-    }
-}
 
-const mapDispatchToProps = (dispatch: Dispatch<CommonTypesAC>): MapDispatchPropsType => {
+const mapStateToProps = (state: AppStateType)=>{
     return {
-        changeFilter(todolistId: string, filterValue: FilterValuesTypes) {
-            dispatch(changeFilterAC(todolistId, filterValue))
-        },
-        removeTask(todolistId: string, taskId: string) {
-            dispatch(removeTaskAC(todolistId, taskId))
-        },
-        addTask(todolistId: string, newTitleText: string) {
-            dispatch(addTaskAC(todolistId, newTitleText))
-        },
-
 
     }
 }
 
-const connector = connect(mapStateToProps, mapDispatchToProps)
+const mapDispatchToProps = (dispatch: Dispatch<CommonTypesAC>) => {
+    return {
+        addTodolist(newTitle: string) {
+            dispatch(addTodolistAC(newTitle))
+        }
+    }
+}
+const connector = connect( mapStateToProps, mapDispatchToProps)
+
 export default connector(App)
 
-
-export type TProps = ConnectedProps<typeof connector>;
-
-type MapStatePropsType = {
-    todolistId: string;
-    todolist: TodolistType[],
-    tasks: TasksType
-}
-
-type MapDispatchPropsType = {
-    changeFilter: (todolistId: string, filterValue: FilterValuesTypes) => void
-    removeTask: (todolistId: string, taskId: string) => void
-    addTask: (todolistId: string, newTitleText: string) => void
-}
-
-export type TodolistPropsType = MapStatePropsType & MapDispatchPropsType
+type TProps = ConnectedProps<typeof connector>;
